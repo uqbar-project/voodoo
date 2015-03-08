@@ -1,0 +1,54 @@
+Compiled from "Conditional.java"
+public class Conditional extends java.lang.Object
+  SourceFile: "Conditional.java"
+  minor version: 0
+  major version: 50
+  Constant pool:
+const #1 = Method	#3.#13;	//  java/lang/Object."<init>":()V
+const #2 = class	#14;	//  Conditional
+const #3 = class	#15;	//  java/lang/Object
+const #4 = Asciz	<init>;
+const #5 = Asciz	()V;
+const #6 = Asciz	Code;
+const #7 = Asciz	LineNumberTable;
+const #8 = Asciz	min;
+const #9 = Asciz	(II)I;
+const #10 = Asciz	StackMapTable;
+const #11 = Asciz	SourceFile;
+const #12 = Asciz	Conditional.java;
+const #13 = NameAndType	#4:#5;//  "<init>":()V
+const #14 = Asciz	Conditional;
+const #15 = Asciz	java/lang/Object;
+
+{
+public Conditional();
+  Code:
+   Stack=1, Locals=1, Args_size=1
+   0:	aload_0
+   1:	invokespecial	#1; //Method java/lang/Object."<init>":()V
+   4:	return
+  LineNumberTable: 
+   line 1: 0
+
+
+public int min(int, int);
+  Code:
+   Stack=2, Locals=3, Args_size=3
+   0:	iload_1
+   1:	iload_2
+   2:	if_icmpge	7
+   5:	iload_1
+   6:	ireturn
+   7:	iload_2
+   8:	ireturn
+  LineNumberTable: 
+   line 3: 0
+   line 4: 5
+   line 6: 7
+
+  StackMapTable: number_of_entries = 1
+   frame_type = 7 /* same */
+
+
+}
+

@@ -1,0 +1,63 @@
+Classfile /home/nicolas/Desarrollo/Programas/Scala/bytecodetools/src/test/resources/Foo.class
+  Last modified 24/06/2013; size 381 bytes
+  MD5 checksum 6a8fc4fb25e8353b2c9182550594ba4a
+  Compiled from "Foo.java"
+public class Foo
+  SourceFile: "Foo.java"
+  minor version: 0
+  major version: 51
+  flags: ACC_PUBLIC, ACC_SUPER
+Constant pool:
+   #1 = Methodref          #4.#17         //  java/lang/Object."<init>":()V
+   #2 = Fieldref           #3.#18         //  Foo.bar:Ljava/lang/String;
+   #3 = Class              #19            //  Foo
+   #4 = Class              #20            //  java/lang/Object
+   #5 = Utf8               bar
+   #6 = Utf8               Ljava/lang/String;
+   #7 = Utf8               <init>
+   #8 = Utf8               ()V
+   #9 = Utf8               Code
+  #10 = Utf8               LineNumberTable
+  #11 = Utf8               getBar
+  #12 = Utf8               ()Ljava/lang/String;
+  #13 = Utf8               setBar
+  #14 = Utf8               (Ljava/lang/String;)V
+  #15 = Utf8               SourceFile
+  #16 = Utf8               Foo.java
+  #17 = NameAndType        #7:#8          //  "<init>":()V
+  #18 = NameAndType        #5:#6          //  bar:Ljava/lang/String;
+  #19 = Utf8               Foo
+  #20 = Utf8               java/lang/Object
+{
+  public Foo();
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0       
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return        
+      LineNumberTable:
+        line 1: 0
+
+  public java.lang.String getBar();
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0       
+         1: getfield      #2                  // Field bar:Ljava/lang/String;
+         4: areturn       
+      LineNumberTable:
+        line 6: 0
+
+  public void setBar(java.lang.String);
+    flags: ACC_PUBLIC
+    Code:
+      stack=2, locals=2, args_size=2
+         0: aload_0       
+         1: aload_1       
+         2: putfield      #2                  // Field bar:Ljava/lang/String;
+         5: return        
+      LineNumberTable:
+        line 10: 0
+        line 11: 5
+}

@@ -1,0 +1,81 @@
+Compiled from "Looper.java"
+public class Looper extends java.lang.Object
+  SourceFile: "Looper.java"
+  minor version: 0
+  major version: 50
+  Constant pool:
+const #1 = Method	#4.#17;	//  java/lang/Object."<init>":()V
+const #2 = Field	#3.#18;	//  Looper.count:I
+const #3 = class	#19;	//  Looper
+const #4 = class	#20;	//  java/lang/Object
+const #5 = Asciz	count;
+const #6 = Asciz	I;
+const #7 = Asciz	<init>;
+const #8 = Asciz	()V;
+const #9 = Asciz	Code;
+const #10 = Asciz	LineNumberTable;
+const #11 = Asciz	loop;
+const #12 = Asciz	(I)V;
+const #13 = Asciz	StackMapTable;
+const #14 = Asciz	()I;
+const #15 = Asciz	SourceFile;
+const #16 = Asciz	Looper.java;
+const #17 = NameAndType	#7:#8;//  "<init>":()V
+const #18 = NameAndType	#5:#6;//  count:I
+const #19 = Asciz	Looper;
+const #20 = Asciz	java/lang/Object;
+
+{
+public Looper();
+  Code:
+   Stack=1, Locals=1, Args_size=1
+   0:	aload_0
+   1:	invokespecial	#1; //Method java/lang/Object."<init>":()V
+   4:	return
+  LineNumberTable: 
+   line 1: 0
+
+
+public void loop(int);
+  Code:
+   Stack=3, Locals=3, Args_size=2
+   0:	iconst_0
+   1:	istore_2
+   2:	iload_2
+   3:	iload_1
+   4:	if_icmpge	23
+   7:	aload_0
+   8:	dup
+   9:	getfield	#2; //Field count:I
+   12:	iconst_1
+   13:	iadd
+   14:	putfield	#2; //Field count:I
+   17:	iinc	2, 1
+   20:	goto	2
+   23:	return
+  LineNumberTable: 
+   line 6: 0
+   line 8: 2
+   line 9: 7
+   line 10: 17
+   line 12: 23
+
+  StackMapTable: number_of_entries = 2
+   frame_type = 252 /* append */
+     offset_delta = 2
+     locals = [ int ]
+   frame_type = 20 /* same */
+
+
+public int count();
+  Code:
+   Stack=1, Locals=1, Args_size=1
+   0:	aload_0
+   1:	getfield	#2; //Field count:I
+   4:	ireturn
+  LineNumberTable: 
+   line 15: 0
+
+
+}
+

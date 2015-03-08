@@ -1,0 +1,92 @@
+Compiled from "SimpleBean.java"
+public class SimpleBean extends java.lang.Object
+  SourceFile: "SimpleBean.java"
+  minor version: 0
+  major version: 50
+  Constant pool:
+const #1 = Method	#5.#24;	//  java/lang/Object."<init>":()V
+const #2 = Field	#4.#25;	//  SimpleBean.field1:Ljava/lang/String;
+const #3 = Field	#4.#26;	//  SimpleBean.field2:I
+const #4 = class	#27;	//  SimpleBean
+const #5 = class	#28;	//  java/lang/Object
+const #6 = Asciz	field1;
+const #7 = Asciz	Ljava/lang/String;;
+const #8 = Asciz	field2;
+const #9 = Asciz	I;
+const #10 = Asciz	<init>;
+const #11 = Asciz	()V;
+const #12 = Asciz	Code;
+const #13 = Asciz	LineNumberTable;
+const #14 = Asciz	getField1;
+const #15 = Asciz	()Ljava/lang/String;;
+const #16 = Asciz	setField1;
+const #17 = Asciz	(Ljava/lang/String;)V;
+const #18 = Asciz	getField2;
+const #19 = Asciz	()I;
+const #20 = Asciz	setField2;
+const #21 = Asciz	(I)V;
+const #22 = Asciz	SourceFile;
+const #23 = Asciz	SimpleBean.java;
+const #24 = NameAndType	#10:#11;//  "<init>":()V
+const #25 = NameAndType	#6:#7;//  field1:Ljava/lang/String;
+const #26 = NameAndType	#8:#9;//  field2:I
+const #27 = Asciz	SimpleBean;
+const #28 = Asciz	java/lang/Object;
+
+{
+public SimpleBean();
+  Code:
+   Stack=1, Locals=1, Args_size=1
+   0:	aload_0
+   1:	invokespecial	#1; //Method java/lang/Object."<init>":()V
+   4:	return
+  LineNumberTable: 
+   line 1: 0
+
+
+public java.lang.String getField1();
+  Code:
+   Stack=1, Locals=1, Args_size=1
+   0:	aload_0
+   1:	getfield	#2; //Field field1:Ljava/lang/String;
+   4:	areturn
+  LineNumberTable: 
+   line 6: 0
+
+
+public void setField1(java.lang.String);
+  Code:
+   Stack=2, Locals=2, Args_size=2
+   0:	aload_0
+   1:	aload_1
+   2:	putfield	#2; //Field field1:Ljava/lang/String;
+   5:	return
+  LineNumberTable: 
+   line 10: 0
+   line 11: 5
+
+
+public int getField2();
+  Code:
+   Stack=1, Locals=1, Args_size=1
+   0:	aload_0
+   1:	getfield	#3; //Field field2:I
+   4:	ireturn
+  LineNumberTable: 
+   line 14: 0
+
+
+public void setField2(int);
+  Code:
+   Stack=2, Locals=2, Args_size=2
+   0:	aload_0
+   1:	iload_1
+   2:	putfield	#3; //Field field2:I
+   5:	return
+  LineNumberTable: 
+   line 18: 0
+   line 19: 5
+
+
+}
+
