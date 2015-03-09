@@ -1,6 +1,4 @@
-package org.uqbar.voodoo.javaadapter.builder.auxiliars;
-
-public class Blah {
+public class Bleh {
 
 	public static int ATT;
 

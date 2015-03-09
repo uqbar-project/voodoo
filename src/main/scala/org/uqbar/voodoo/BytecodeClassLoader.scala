@@ -29,10 +29,12 @@ class BytecodeClassLoader extends ClassLoader with ClassWriter {
 	}
 
 	def importClass(path: String) = {
-		val namePattern = """.*\.(.*)\.class""".r
+		val namePattern = s".*\\${File.separator}(.*)\\.class".r
 		val namePattern(name) = path
 		val bytes = Files.readAllBytes(Paths.get(path))
 
 		defineClass(name, bytes, 0, bytes.length)
 	}
+
+	//	override def loadClass(name: String) = loadClass(name, true)
 }

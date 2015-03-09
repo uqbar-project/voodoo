@@ -2,7 +2,7 @@ name := "voodoo"
 
 description := "Scala based tool to manipulate JVM bytecode"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.6"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

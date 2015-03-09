@@ -1,283 +1,58 @@
 package org.uqbar.voodoo.exhaustive
 
-import java.lang.invoke.CallSite
+import java.lang.invoke.ConstantCallSite
 import java.lang.invoke.MethodHandles.Lookup
 import java.lang.invoke.MethodType
 import java.util.ArrayList
 import java.util.Arrays
-import java.util.Collection
+import java.util.Date
 import java.util.HashSet
-
-import scala.reflect.runtime.universe
-
 import org.scalatest.FunSuite
-import org.uqbar.voodoo.builder.auxiliars.Bleh
-import org.uqbar.voodoo.builder.auxiliars.CustomBootstrap
 import org.uqbar.voodoo.model.$
-import org.uqbar.voodoo.model.AALOAD
-import org.uqbar.voodoo.model.AASTORE
-import org.uqbar.voodoo.model.ACONST_NULL
-import org.uqbar.voodoo.model.ALOAD
-import org.uqbar.voodoo.model.ALOAD_0
-import org.uqbar.voodoo.model.ALOAD_1
-import org.uqbar.voodoo.model.ALOAD_2
-import org.uqbar.voodoo.model.ALOAD_3
-import org.uqbar.voodoo.model.ANEWARRAY
-import org.uqbar.voodoo.model.ARETURN
-import org.uqbar.voodoo.model.ARRAYLENGTH
-import org.uqbar.voodoo.model.ASTORE
-import org.uqbar.voodoo.model.ASTORE_0
-import org.uqbar.voodoo.model.ASTORE_1
-import org.uqbar.voodoo.model.ASTORE_2
-import org.uqbar.voodoo.model.ASTORE_3
-import org.uqbar.voodoo.model.ATHROW
-import org.uqbar.voodoo.model.BALOAD
-import org.uqbar.voodoo.model.BASTORE
-import org.uqbar.voodoo.model.BIPUSH
-import org.uqbar.voodoo.model.CALOAD
-import org.uqbar.voodoo.model.CASTORE
-import org.uqbar.voodoo.model.CHECKCAST
 import org.uqbar.voodoo.model.Class
 import org.uqbar.voodoo.model.ClassVersion.Java_6
-import org.uqbar.voodoo.model.D2F
-import org.uqbar.voodoo.model.D2I
-import org.uqbar.voodoo.model.D2L
-import org.uqbar.voodoo.model.DADD
-import org.uqbar.voodoo.model.DALOAD
-import org.uqbar.voodoo.model.DASTORE
-import org.uqbar.voodoo.model.DCMPG
-import org.uqbar.voodoo.model.DCMPL
-import org.uqbar.voodoo.model.DCONST_0
-import org.uqbar.voodoo.model.DCONST_1
-import org.uqbar.voodoo.model.DDIV
-import org.uqbar.voodoo.model.DLOAD
-import org.uqbar.voodoo.model.DLOAD_0
-import org.uqbar.voodoo.model.DLOAD_1
-import org.uqbar.voodoo.model.DLOAD_2
-import org.uqbar.voodoo.model.DLOAD_3
-import org.uqbar.voodoo.model.DMUL
-import org.uqbar.voodoo.model.DNEG
-import org.uqbar.voodoo.model.DREM
-import org.uqbar.voodoo.model.DRETURN
-import org.uqbar.voodoo.model.DSTORE
-import org.uqbar.voodoo.model.DSTORE_0
-import org.uqbar.voodoo.model.DSTORE_1
-import org.uqbar.voodoo.model.DSTORE_2
-import org.uqbar.voodoo.model.DSTORE_3
-import org.uqbar.voodoo.model.DSUB
-import org.uqbar.voodoo.model.DUP
-import org.uqbar.voodoo.model.DUP2
-import org.uqbar.voodoo.model.DUP2_X1
-import org.uqbar.voodoo.model.DUP2_X2
-import org.uqbar.voodoo.model.DUP_X1
-import org.uqbar.voodoo.model.DUP_X2
-import org.uqbar.voodoo.model.F2D
-import org.uqbar.voodoo.model.F2I
-import org.uqbar.voodoo.model.F2L
-import org.uqbar.voodoo.model.FADD
-import org.uqbar.voodoo.model.FALOAD
-import org.uqbar.voodoo.model.FASTORE
-import org.uqbar.voodoo.model.FCMPG
-import org.uqbar.voodoo.model.FCMPL
-import org.uqbar.voodoo.model.FCONST_0
-import org.uqbar.voodoo.model.FCONST_1
-import org.uqbar.voodoo.model.FCONST_2
-import org.uqbar.voodoo.model.FDIV
-import org.uqbar.voodoo.model.FLOAD
-import org.uqbar.voodoo.model.FLOAD_0
-import org.uqbar.voodoo.model.FLOAD_1
-import org.uqbar.voodoo.model.FLOAD_2
-import org.uqbar.voodoo.model.FLOAD_3
-import org.uqbar.voodoo.model.FMUL
-import org.uqbar.voodoo.model.FNEG
-import org.uqbar.voodoo.model.FREM
-import org.uqbar.voodoo.model.FRETURN
-import org.uqbar.voodoo.model.FSTORE
-import org.uqbar.voodoo.model.FSTORE_0
-import org.uqbar.voodoo.model.FSTORE_1
-import org.uqbar.voodoo.model.FSTORE_2
-import org.uqbar.voodoo.model.FSTORE_3
-import org.uqbar.voodoo.model.FSUB
-import org.uqbar.voodoo.model.GETFIELD
-import org.uqbar.voodoo.model.GETSTATIC
-import org.uqbar.voodoo.model.GOTO
-import org.uqbar.voodoo.model.GOTO_W
-import org.uqbar.voodoo.model.I2B
-import org.uqbar.voodoo.model.I2C
-import org.uqbar.voodoo.model.I2D
-import org.uqbar.voodoo.model.I2F
-import org.uqbar.voodoo.model.I2L
-import org.uqbar.voodoo.model.I2S
-import org.uqbar.voodoo.model.IADD
-import org.uqbar.voodoo.model.IALOAD
-import org.uqbar.voodoo.model.IAND
-import org.uqbar.voodoo.model.IASTORE
-import org.uqbar.voodoo.model.ICONST_0
-import org.uqbar.voodoo.model.ICONST_1
-import org.uqbar.voodoo.model.ICONST_2
-import org.uqbar.voodoo.model.ICONST_3
-import org.uqbar.voodoo.model.ICONST_4
-import org.uqbar.voodoo.model.ICONST_5
-import org.uqbar.voodoo.model.ICONST_M1
-import org.uqbar.voodoo.model.IDIV
-import org.uqbar.voodoo.model.IFEQ
-import org.uqbar.voodoo.model.IFGE
-import org.uqbar.voodoo.model.IFGT
-import org.uqbar.voodoo.model.IFLE
-import org.uqbar.voodoo.model.IFLT
-import org.uqbar.voodoo.model.IFNE
-import org.uqbar.voodoo.model.IFNONNULL
-import org.uqbar.voodoo.model.IFNULL
-import org.uqbar.voodoo.model.IF_ACMPEQ
-import org.uqbar.voodoo.model.IF_ACMPNE
-import org.uqbar.voodoo.model.IF_ICMPEQ
-import org.uqbar.voodoo.model.IF_ICMPGE
-import org.uqbar.voodoo.model.IF_ICMPGT
-import org.uqbar.voodoo.model.IF_ICMPLE
-import org.uqbar.voodoo.model.IF_ICMPLT
-import org.uqbar.voodoo.model.IF_ICMPNE
-import org.uqbar.voodoo.model.IINC
-import org.uqbar.voodoo.model.ILOAD
-import org.uqbar.voodoo.model.ILOAD_0
-import org.uqbar.voodoo.model.ILOAD_1
-import org.uqbar.voodoo.model.ILOAD_2
-import org.uqbar.voodoo.model.ILOAD_3
-import org.uqbar.voodoo.model.IMUL
-import org.uqbar.voodoo.model.INEG
-import org.uqbar.voodoo.model.INSTANCEOF
-import org.uqbar.voodoo.model.INVOKEDYNAMIC
-import org.uqbar.voodoo.model.INVOKEINTERFACE
-import org.uqbar.voodoo.model.INVOKESPECIAL
-import org.uqbar.voodoo.model.INVOKESTATIC
-import org.uqbar.voodoo.model.INVOKEVIRTUAL
-import org.uqbar.voodoo.model.IOR
-import org.uqbar.voodoo.model.IREM
-import org.uqbar.voodoo.model.IRETURN
-import org.uqbar.voodoo.model.ISHL
-import org.uqbar.voodoo.model.ISHR
-import org.uqbar.voodoo.model.ISTORE
-import org.uqbar.voodoo.model.ISTORE_0
-import org.uqbar.voodoo.model.ISTORE_1
-import org.uqbar.voodoo.model.ISTORE_2
-import org.uqbar.voodoo.model.ISTORE_3
-import org.uqbar.voodoo.model.ISUB
-import org.uqbar.voodoo.model.IUSHR
-import org.uqbar.voodoo.model.IXOR
-import org.uqbar.voodoo.model.Init
-import org.uqbar.voodoo.model.JSR
-import org.uqbar.voodoo.model.JSR_W
-import org.uqbar.voodoo.model.L2D
-import org.uqbar.voodoo.model.L2F
-import org.uqbar.voodoo.model.L2I
-import org.uqbar.voodoo.model.LADD
-import org.uqbar.voodoo.model.LALOAD
-import org.uqbar.voodoo.model.LAND
-import org.uqbar.voodoo.model.LASTORE
-import org.uqbar.voodoo.model.LCMP
-import org.uqbar.voodoo.model.LCONST_0
-import org.uqbar.voodoo.model.LCONST_1
-import org.uqbar.voodoo.model.LDC
-import org.uqbar.voodoo.model.LDC2_W
-import org.uqbar.voodoo.model.LDC_W
-import org.uqbar.voodoo.model.LDIV
-import org.uqbar.voodoo.model.LLOAD
-import org.uqbar.voodoo.model.LLOAD_0
-import org.uqbar.voodoo.model.LLOAD_1
-import org.uqbar.voodoo.model.LLOAD_2
-import org.uqbar.voodoo.model.LLOAD_3
-import org.uqbar.voodoo.model.LMUL
-import org.uqbar.voodoo.model.LNEG
-import org.uqbar.voodoo.model.LOOKUPSWITCH
-import org.uqbar.voodoo.model.LOR
-import org.uqbar.voodoo.model.LREM
-import org.uqbar.voodoo.model.LRETURN
-import org.uqbar.voodoo.model.LSHL
-import org.uqbar.voodoo.model.LSHR
-import org.uqbar.voodoo.model.LSTORE
-import org.uqbar.voodoo.model.LSTORE_0
-import org.uqbar.voodoo.model.LSTORE_1
-import org.uqbar.voodoo.model.LSTORE_2
-import org.uqbar.voodoo.model.LSTORE_3
-import org.uqbar.voodoo.model.LSUB
-import org.uqbar.voodoo.model.LUSHR
-import org.uqbar.voodoo.model.LXOR
-import org.uqbar.voodoo.model.MONITORENTER
-import org.uqbar.voodoo.model.MONITOREXIT
-import org.uqbar.voodoo.model.MULTIANEWARRAY
-import org.uqbar.voodoo.model.MethodFromSignature
-import org.uqbar.voodoo.model.MethodModifier.Static
-import org.uqbar.voodoo.model.NEW
-import org.uqbar.voodoo.model.NEWARRAY
-import org.uqbar.voodoo.model.NOP
-import org.uqbar.voodoo.model.POP
-import org.uqbar.voodoo.model.POP2
-import org.uqbar.voodoo.model.PUTFIELD
-import org.uqbar.voodoo.model.PUTSTATIC
-import org.uqbar.voodoo.model.RET
-import org.uqbar.voodoo.model.RETURN
-import org.uqbar.voodoo.model.SALOAD
-import org.uqbar.voodoo.model.SASTORE
-import org.uqbar.voodoo.model.SIPUSH
-import org.uqbar.voodoo.model.SWAP
-import org.uqbar.voodoo.model.SlotRef_to_Bootstrap
-import org.uqbar.voodoo.model.TABLESWITCH
-import org.uqbar.voodoo.model.UnitExt
-import org.uqbar.voodoo.model.WIDE
 import org.uqbar.voodoo.mutator.MutableType
+import java.awt.Point
+import org.uqbar.voodoo.BytecodeClassLoader
+import java.lang.reflect.Field
 
 //TODO: Testear el byteSize
 //TODO: Testear el stackMapTable / maxStack
 
-class Foo
+//▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+// TESTS
+//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 
 trait ExhaustiveInstructionTest extends FunSuite {
 
 	protected val CONTEXT_TYPE = $("TestClass")
 	protected val METHOD_SELECTOR = "test"
 
+	var classLoader: BytecodeClassLoader = _
+
 	testInstruction("AALOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Array[Object]] -> $[Object])( // Returns the first object of the given array.
-				ALOAD_1,
-				ICONST_0,
-				AALOAD,
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("AALOAD") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
-			val arg = Array[Object](new Foo)
+			val arg = Array[Object](new Date)
 			Seq(Run(arg){ _ == arg(0) })
 		}
 	)
 
 	testInstruction("AASTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Array[Object]] -> $[Unit])( // Stores the given object as the first element of the given array.
-				ALOAD_2,
-				ICONST_0,
-				ALOAD_1,
-				AASTORE,
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("AASTORE") },
 		maxLocals = 3,
 		maxStack = 3,
 		runs = {
-			val arg1 = new Bleh
+			val arg1 = "foo"
 			val arg2 = new Array(1)
 			Seq(Run(arg1, arg2){ _ ⇒ arg1 == arg2(0) })
 		}
 	)
 
 	testInstruction("ACONST_NULL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Object])( // Returns null.
-				ACONST_NULL,
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ACONST_NULL") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -286,96 +61,65 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ALOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object])( // Returns the given object.
-				ALOAD(1),
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ALOAD") },
 		maxLocals = 2,
 		maxStack = 1,
 
 		runs = {
-			val arg = new Bleh
+			val arg = "foo"
 			Seq(Run(arg){ _ == arg })
 		}
 	)
 
 	testInstruction("ALOAD_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object])( // Returns the given object.
-				ALOAD_0,
-				ARETURN
-			).as(Static)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ALOAD_0") },
 		maxLocals = 1,
 		maxStack = 1,
 
 		runs = {
-			val arg = new Bleh
+			val arg = "foo"
 			Seq(Run(arg){ _ == arg })
 		}
 	)
 
 	testInstruction("ALOAD_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object])( // Returns the given object.
-				ALOAD_1,
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ALOAD_1") },
 		maxLocals = 2,
 		maxStack = 1,
 
 		runs = {
-			val arg = new Bleh
+			val arg = "foo"
 			Seq(Run(arg){ _ == arg })
 		}
 	)
 
 	testInstruction("ALOAD_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object] -> $[Object])( // Returns the second given object.
-				ALOAD_2,
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ALOAD_2") },
 		maxLocals = 3,
 		maxStack = 1,
 
 		runs = {
 			val arg1 = null
-			val arg2 = new Bleh
+			val arg2 = "foo"
 			Seq(Run(arg1, arg2){ _ == arg2 })
 		}
 	)
 
 	testInstruction("ALOAD_3")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object] -> $[Object] -> $[Object])( // Returns the third given object.
-				ALOAD_3,
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ALOAD_3") },
 		maxLocals = 4,
 		maxStack = 1,
 
 		runs = {
 			val arg1 = null
 			val arg2 = null
-			val arg3 = new Bleh
+			val arg3 = "foo"
 			Seq(Run(arg1, arg2, arg3){ _ == arg3 })
 		}
 	)
 
 	testInstruction("ANEWARRAY")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Array[Object]])( // Returns an empty Object[] of length 5.
-				ICONST_5,
-				ANEWARRAY($[Object]),
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ANEWARRAY") },
 		maxLocals = 1,
 		maxStack = 1,
 
@@ -385,12 +129,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ARETURN")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Object])( // Returns null.
-				ACONST_NULL,
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ARETURN") },
 		maxLocals = 1,
 		maxStack = 1,
 
@@ -400,13 +139,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ARRAYLENGTH")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Array[Object]] -> $[Int])( // Returns the length of the given array.
-				ALOAD_1,
-				ARRAYLENGTH,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ARRAYLENGTH") },
 		maxLocals = 2,
 		maxStack = 1,
 
@@ -417,106 +150,62 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ASTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object])( // Returns the given object after storing it in the local 2.
-				ALOAD_1,
-				ASTORE(2),
-				ALOAD(2),
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ASTORE") },
 		maxLocals = 3,
 		maxStack = 1,
 
 		runs = {
-			val arg = new Bleh
+			val arg = "foo"
 			Seq(Run(arg){ _ == arg })
 		}
 	)
 
 	testInstruction("ASTORE_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object])( // Returns the given object after storing it in the local 0.
-				ALOAD_1,
-				ASTORE_0,
-				ALOAD_0,
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ASTORE_0") },
 		maxLocals = 2,
 		maxStack = 1,
 
 		runs = {
-			val arg = new Bleh
+			val arg = "foo"
 			Seq(Run(arg){ _ == arg })
 		}
 	)
 
 	testInstruction("ASTORE_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object])( // Returns the given object after storing it in the local 1.
-				ALOAD_0,
-				ASTORE_1,
-				ALOAD_1,
-				ARETURN
-			).as(Static)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ASTORE_1") },
 		maxLocals = 2,
 		maxStack = 1,
 
 		runs = {
-			val arg = new Bleh
+			val arg = "foo"
 			Seq(Run(arg){ _ == arg })
 		}
 	)
 
 	testInstruction("ASTORE_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object])( // Returns the given object after storing it in the local 2.
-				ALOAD_1,
-				ASTORE_2,
-				ALOAD_2,
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ASTORE_2") },
 		maxLocals = 3,
 		maxStack = 1,
 
 		runs = {
-			val arg = new Bleh
+			val arg = "foo"
 			Seq(Run(arg){ _ == arg })
 		}
 	)
 
 	testInstruction("ASTORE_3")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object])( // Returns the given object after storing it in the local 3.
-				ALOAD_1,
-				ASTORE_2,
-				ALOAD_1,
-				ASTORE_3,
-				ALOAD_3,
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ASTORE_3") },
 		maxLocals = 4,
 		maxStack = 1,
 
 		runs = {
-			val arg = new Bleh
+			val arg = "foo"
 			Seq(Run(arg){ _ == arg })
 		}
 	)
 
 	testInstruction("ATHROW")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Unit])( // Throws ArithmeticException.
-				NEW($[ArithmeticException]),
-				DUP,
-				INVOKESPECIAL($[ArithmeticException] >> Init()),
-				ATHROW
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ATHROW") },
 		maxLocals = 1,
 		maxStack = 2,
 
@@ -526,14 +215,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("BALOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Array[Boolean]] -> $[Boolean])( // Returns the first Boolean of the given array.
-				ALOAD_1,
-				ICONST_0,
-				BALOAD,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("BALOAD") },
 		maxLocals = 2,
 		maxStack = 2,
 
@@ -544,15 +226,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("BASTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Boolean] -> $[Array[Boolean]] -> $[Unit])( // Stores the given Boolean as the first element of the given array.
-				ALOAD_2,
-				ICONST_0,
-				ILOAD_1,
-				BASTORE,
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("BASTORE") },
 		maxLocals = 3,
 		maxStack = 3,
 
@@ -564,12 +238,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("BIPUSH")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Byte])( // Returns 5.
-				BIPUSH(5),
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("BIPUSH") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -578,14 +247,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("CALOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Array[Char]] -> $[Char])( // Returns the first char of the given array.
-				ALOAD_1,
-				ICONST_0,
-				CALOAD,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("CALOAD") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -595,15 +257,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("CASTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Char] -> $[Array[Char]] -> $[Unit])( // Stores the given char as the first element of the given array.
-				ALOAD_2,
-				ICONST_0,
-				ILOAD_1,
-				CASTORE,
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("CASTORE") },
 		maxLocals = 3,
 		maxStack = 3,
 		runs = {
@@ -614,29 +268,17 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("CHECKCAST")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Foo])( // Returns the given object casted to another type.
-				ALOAD_1,
-				CHECKCAST($[Foo]),
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("CHECKCAST") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
-			val arg = new Foo
+			val arg = "foo"
 			Seq(Run(arg){ _ == arg })
 		}
 	)
 
 	testInstruction("D2F")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Float])( // Returns the given argument converted to another type.
-				DLOAD_1,
-				D2F,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("D2F") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -646,13 +288,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("D2I")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Int])( // Returns the given argument converted to another type.
-				DLOAD_1,
-				D2I,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("D2I") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -662,13 +298,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("D2L")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Long])( // Returns the given argument converted to another type.
-				DLOAD_1,
-				D2L,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("D2L") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -678,14 +308,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DADD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Double])( // Returns 5.0.
-				LDC2_W(3.0),
-				LDC2_W(2.0),
-				DADD,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DADD") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -694,14 +317,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DALOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Array[Double]] -> $[Double])( // Returns the first double of the given array.
-				ALOAD_1,
-				ICONST_0,
-				DALOAD,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DALOAD") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -711,15 +327,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DASTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Array[Double]] -> $[Unit])( // Stores the given double as the first element of the given array.
-				ALOAD_3,
-				ICONST_0,
-				DLOAD_1,
-				DASTORE,
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DASTORE") },
 		maxLocals = 4,
 		maxStack = 4,
 		runs = {
@@ -730,14 +338,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DCMPG")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Double] -> $[Int])( // Compares the received doubles. Answers 1 if either one is NaN.
-				DLOAD_1,
-				DLOAD_3,
-				DCMPG,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DCMPG") },
 		maxLocals = 5,
 		maxStack = 4,
 		runs = {
@@ -755,14 +356,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DCMPL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Double] -> $[Int])( // Compares the received doubles. Answers -1 if either one is NaN.
-				DLOAD_1,
-				DLOAD_3,
-				DCMPL,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DCMPL") },
 		maxLocals = 5,
 		maxStack = 4,
 		runs = {
@@ -780,12 +374,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DCONST_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Double])( // Returns 0.0.
-				DCONST_0,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DCONST_0") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -794,12 +383,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DCONST_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Double])( // Returns 1.0.
-				DCONST_1,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DCONST_1") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -808,14 +392,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DDIV")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Double])( // Returns 2.5.
-				LDC2_W(5.0),
-				LDC2_W(2.0),
-				DDIV,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DDIV") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -824,12 +401,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DLOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Double])( // Returns the given double.
-				DLOAD(1),
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DLOAD") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -839,12 +411,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DLOAD_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Double])( // Returns the given double.
-				DLOAD_0,
-				DRETURN
-			).as(Static)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DLOAD_0") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -854,12 +421,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DLOAD_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Double])( // Returns the given double.
-				DLOAD_1,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DLOAD_1") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -869,12 +431,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DLOAD_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Double] -> $[Double])( // Returns the given double.
-				DLOAD_2,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DLOAD_2") },
 		maxLocals = 4,
 		maxStack = 2,
 		runs = {
@@ -885,12 +442,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DLOAD_3")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Double] -> $[Double])( // Returns the given double.
-				DLOAD_3,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DLOAD_3") },
 		maxLocals = 5,
 		maxStack = 2,
 		runs = {
@@ -901,14 +453,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DMUL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Double])( // Returns 6.0.
-				LDC2_W(3.0),
-				LDC2_W(2.0),
-				DMUL,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DMUL") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -917,13 +462,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DNEG")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Double])( // Returns -3.0.
-				LDC2_W(3.0),
-				DNEG,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DNEG") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -932,14 +471,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DREM")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Double])( // Returns 1.0.
-				LDC2_W(5.0),
-				LDC2_W(2.0),
-				DREM,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DREM") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -948,12 +480,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DRETURN")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Double])( // Returns the given double.
-				DLOAD_1,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DRETURN") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -963,14 +490,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DSTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Double])( // Returns the given double after storing it in the local 3.
-				DLOAD_1,
-				DSTORE(3),
-				DLOAD(3),
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DSTORE") },
 		maxLocals = 5,
 		maxStack = 2,
 		runs = {
@@ -980,14 +500,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DSTORE_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Double])( // Returns 1.0 after storing it in the local 0.
-				DCONST_1,
-				DSTORE_0,
-				DLOAD_0,
-				DRETURN
-			).as(Static)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DSTORE_0") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -996,14 +509,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DSTORE_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Double])( // Returns the given double after storing it in the local 1.
-				DLOAD_1,
-				DSTORE_1,
-				DLOAD_1,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DSTORE_1") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -1013,14 +519,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DSTORE_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Double])( // Returns 1.0 after storing it in the local 2.
-				DCONST_1,
-				DSTORE_2,
-				DLOAD_2,
-				DRETURN
-			).as(Static)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DSTORE_2") },
 		maxLocals = 4,
 		maxStack = 2,
 		runs = {
@@ -1030,14 +529,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DSTORE_3")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Double])( // Returns the given double after storing it in the local 3.
-				DLOAD_1,
-				DSTORE_3,
-				DLOAD_3,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DSTORE_3") },
 		maxLocals = 5,
 		maxStack = 2,
 		runs = {
@@ -1047,14 +539,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DSUB")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Double])( // Returns 1.0.
-				LDC2_W(3.0),
-				LDC2_W(2.0),
-				DSUB,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DSUB") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -1063,14 +548,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DUP")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Subtracts the received int from itself and returns 0.
-				ILOAD_1,
-				DUP,
-				ISUB,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DUP") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -1080,16 +558,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DUP_X1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Subtracts 0 from the received int, and then subtracts it from the result. Returns the received int negated.
-				ILOAD_1,
-				ICONST_0,
-				DUP_X1,
-				ISUB,
-				ISUB,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DUP_X1") },
 		maxLocals = 2,
 		maxStack = 3,
 		runs = {
@@ -1099,18 +568,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DUP_X2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Subtracts from the receiver int the result of 1 minus subtracting it from 0. Returns -1.
-				ICONST_1,
-				ICONST_0,
-				ILOAD_1,
-				DUP_X2,
-				ISUB,
-				ISUB,
-				ISUB,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DUP_X2") },
 		maxLocals = 2,
 		maxStack = 4,
 		runs = {
@@ -1120,14 +578,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DUP2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Long])( // Subtracts the received long from itself and returns 0L.
-				LLOAD_1,
-				DUP2,
-				LSUB,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DUP2") },
 		maxLocals = 3,
 		maxStack = 4,
 		runs = {
@@ -1137,19 +588,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DUP2_X1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Long])( // Returns the received int converted to long and negated.
-				ILOAD_1,
-				LCONST_0,
-				DUP2_X1,
-				LSTORE_2,
-				I2L,
-				LLOAD_2,
-				LSUB,
-				LSUB,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DUP2_X1") },
 		maxLocals = 4,
 		maxStack = 6,
 		runs = {
@@ -1159,16 +598,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("DUP2_X2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Long])( // Subtracts 0L from the received long, and then subtracts it from the result. Returns the received long negated.
-				LLOAD_1,
-				LCONST_0,
-				DUP2_X2,
-				LSUB,
-				LSUB,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("DUP2_X2") },
 		maxLocals = 3,
 		maxStack = 6,
 		runs = {
@@ -1178,13 +608,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("F2D")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Double])( // Returns the given argument converted to another type.
-				FLOAD_1,
-				F2D,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("F2D") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -1194,13 +618,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("F2I")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Int])( // Returns the given argument converted to another type.
-				FLOAD_1,
-				F2I,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("F2I") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -1210,13 +628,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("F2L")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Long])( // Returns the given argument converted to another type.
-				FLOAD_1,
-				F2L,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("F2L") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -1226,14 +638,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FADD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Float])( // Returns 5F.
-				LDC_W(3.0F),
-				LDC_W(2.0F),
-				FADD,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FADD") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -1242,14 +647,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FALOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Array[Float]] -> $[Float])( // Returns the first float of the given array.
-				ALOAD_1,
-				ICONST_0,
-				FALOAD,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FALOAD") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -1259,15 +657,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FASTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Array[Float]] -> $[Unit])( // Stores the given float as the first element of the given array.
-				ALOAD_2,
-				ICONST_0,
-				FLOAD_1,
-				FASTORE,
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FASTORE") },
 		maxLocals = 3,
 		maxStack = 3,
 		runs = {
@@ -1278,14 +668,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FCMPG")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Float] -> $[Int])( // Compares the received floats. Answers 1 if either one is NaN.
-				FLOAD_1,
-				FLOAD_2,
-				FCMPG,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FCMPG") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -1303,14 +686,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FCMPL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Float] -> $[Int])( // Compares the received floats. Answers 1 if either one is NaN.
-				FLOAD_1,
-				FLOAD_2,
-				FCMPL,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FCMPL") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -1328,12 +704,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FCONST_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Float])( // Returns 0.0F.
-				FCONST_0,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FCONST_0") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1342,12 +713,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FCONST_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Float])( // Returns 1.0F.
-				FCONST_1,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FCONST_1") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1356,12 +722,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FCONST_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Float])( // Returns 2.0F.
-				FCONST_2,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FCONST_2") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1370,14 +731,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FDIV")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Float])( // Returns 2.5F.
-				LDC_W(5.0F),
-				LDC_W(2.0F),
-				FDIV,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FDIV") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -1386,12 +740,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FLOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Float])( // Returns the given float.
-				FLOAD(1),
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FLOAD") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -1401,12 +750,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FLOAD_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Float])( // Returns the given float.
-				FLOAD_0,
-				FRETURN
-			).as(Static)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FLOAD_0") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1416,12 +760,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FLOAD_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Float])( // Returns the given float.
-				FLOAD_1,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FLOAD_1") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -1431,12 +770,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FLOAD_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Float] -> $[Float])( // Returns the given float.
-				FLOAD_2,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FLOAD_2") },
 		maxLocals = 3,
 		maxStack = 1,
 		runs = {
@@ -1447,12 +781,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FLOAD_3")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Float] -> $[Float])( // Returns the given float.
-				FLOAD_3,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FLOAD_3") },
 		maxLocals = 4,
 		maxStack = 1,
 		runs = {
@@ -1463,14 +792,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FMUL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Float])( // Returns 6.0F.
-				LDC_W(3.0F),
-				LDC_W(2.0F),
-				FMUL,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FMUL") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -1479,13 +801,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FNEG")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Float])( // Returns -3.0F.
-				LDC_W(3.0F),
-				FNEG,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FNEG") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1494,14 +810,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FREM")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Float])( // Returns 1.0F.
-				LDC_W(5.0F),
-				LDC_W(2.0F),
-				FREM,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FREM") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -1510,12 +819,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FRETURN")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Float])( // Returns the given float.
-				FLOAD_1,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FRETURN") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -1525,14 +829,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FSTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Float])( // Returns the given float after storing it in the local 2.
-				FLOAD_1,
-				FSTORE(2),
-				FLOAD(2),
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FSTORE") },
 		maxLocals = 3,
 		maxStack = 1,
 		runs = {
@@ -1542,14 +839,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FSTORE_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Float])( // Returns the given float after storing it in the local 0.
-				FLOAD_1,
-				FSTORE_0,
-				FLOAD_0,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FSTORE_0") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -1559,14 +849,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FSTORE_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Float])( // Returns the given float after storing it in the local 1.
-				FLOAD_1,
-				FSTORE_1,
-				FLOAD_1,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FSTORE_1") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -1576,14 +859,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FSTORE_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Float])( // Returns the given float after storing it in the local 2.
-				FLOAD_1,
-				FSTORE_2,
-				FLOAD_2,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FSTORE_2") },
 		maxLocals = 3,
 		maxStack = 1,
 		runs = {
@@ -1593,16 +869,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FSTORE_3")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Float])( // Returns the given float after storing it in the local 3.
-				FLOAD_1,
-				FSTORE_2,
-				FLOAD_1,
-				FSTORE_3,
-				FLOAD_3,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FSTORE_3") },
 		maxLocals = 4,
 		maxStack = 1,
 		runs = {
@@ -1612,14 +879,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("FSUB")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Float])( // Returns 1F.
-				LDC_W(3.0F),
-				LDC_W(2.0F),
-				FSUB,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("FSUB") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -1628,51 +888,26 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("GETFIELD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Bleh] -> $[Int])( // Returns the target object field
-				ALOAD_1,
-				GETFIELD($[Bleh] >> "att" :: $[Int]),
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("GETFIELD") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
-			val arg = new Bleh
-			arg.att = 15
-			Seq(Run(arg){ _ == arg.att })
+			val arg = new Point(2, 3)
+			Seq(Run(arg){ _ == 2 })
 		}
 	)
 
 	testInstruction("GETSTATIC")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns the ATT static field
-				GETSTATIC($[Bleh] >> "ATT" :: $[Int]),
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("GETSTATIC") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
-			Bleh.ATT = 15
-			Seq(Run(){ _ == Bleh.ATT })
+			Seq(Run(){ _ == Integer.MAX_VALUE })
 		}
 	)
 
 	testInstruction("GOTO")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 5.
-				GOTO("5"),
-				"3" @: ICONST_0,
-				IRETURN,
-
-				"5" @: ICONST_0,
-				ICONST_1,
-				IF_ICMPEQ("3"),
-				ICONST_5,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("GOTO") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -1681,19 +916,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("GOTO_W")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 5.
-				GOTO_W("7"),
-				"5" @: ICONST_0,
-				IRETURN,
-
-				"7" @: ICONST_0,
-				ICONST_1,
-				IF_ICMPEQ("5"),
-				ICONST_5,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("GOTO_W") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -1702,13 +925,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("I2B")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Byte])( // Returns the given argument converted to another type.
-				ILOAD_1,
-				I2B,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("I2B") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -1718,13 +935,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("I2C")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Char])( // Returns the given argument converted to another type.
-				ILOAD_1,
-				I2C,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("I2C") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -1734,13 +945,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("I2D")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Double])( // Returns the given argument converted to another type.
-				ILOAD_1,
-				I2D,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("I2D") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -1750,13 +955,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("I2F")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Float])( // Returns the given argument converted to another type.
-				ILOAD_1,
-				I2F,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("I2F") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -1766,13 +965,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("I2L")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Long])( // Returns the given argument converted to another type.
-				ILOAD_1,
-				I2L,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("I2L") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -1782,13 +975,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("I2S")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Short])( // Returns the given argument converted to another type.
-				ILOAD_1,
-				I2S,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("I2S") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -1798,14 +985,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IADD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 5.
-				ICONST_3,
-				ICONST_2,
-				IADD,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IADD") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -1814,14 +994,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IALOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Array[Int]] -> $[Int])( // Returns the first int of the given array.
-				ALOAD_1,
-				ICONST_0,
-				IALOAD,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IALOAD") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -1831,14 +1004,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IAND")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 4.
-				ICONST_5,
-				ICONST_4,
-				IAND,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IAND") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -1847,15 +1013,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IASTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Array[Int]] -> $[Unit])( // Stores the given int as the first element of the given array.
-				ALOAD_2,
-				ICONST_0,
-				ILOAD_1,
-				IASTORE,
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IASTORE") },
 		maxLocals = 3,
 		maxStack = 3,
 		runs = {
@@ -1866,12 +1024,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ICONST_M1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns -1.
-				ICONST_M1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ICONST_M1") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1880,12 +1033,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ICONST_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 0.
-				ICONST_0,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ICONST_0") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1894,12 +1042,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ICONST_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 1.
-				ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ICONST_1") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1908,12 +1051,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ICONST_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 2.
-				ICONST_2,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ICONST_2") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1922,12 +1060,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ICONST_3")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 3.
-				ICONST_3,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ICONST_3") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1936,12 +1069,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ICONST_4")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 4.
-				ICONST_4,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ICONST_4") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1950,12 +1078,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ICONST_5")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 5.
-				ICONST_5,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ICONST_5") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -1964,14 +1087,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IDIV")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 2.
-				ICONST_5,
-				ICONST_2,
-				IDIV,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IDIV") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -1980,17 +1096,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IF_ACMPEQ")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object] -> $[Int])( // Returns 1 if arguments are equal and 0 if they are not.
-				ALOAD_1,
-				ALOAD_2,
-				IF_ACMPEQ("7"),
-				ICONST_0,
-				IRETURN,
-				"7" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IF_ACMPEQ") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -2004,17 +1110,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IF_ACMPNE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Object] -> $[Int])( // Returns 0 if arguments are equal and 1 if they are not.
-				ALOAD_1,
-				ALOAD_2,
-				IF_ACMPNE("7"),
-				ICONST_0,
-				IRETURN,
-				"7" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IF_ACMPNE") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -2028,20 +1124,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IF_ICMPEQ")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int] -> $[Int])( // Returns 1 if arguments are equal and 0 if they are not.
-				ILOAD_1,
-				ILOAD_2,
-				IF_ICMPEQ("7"),
-				ICONST_0,
-				IRETURN,
-				"7" @: ICONST_1,
-				ISTORE_3,
-				ILOAD_3,
-				ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IF_ICMPEQ") },
 		maxLocals = 4,
 		maxStack = 2,
 		runs = {
@@ -2055,17 +1138,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IF_ICMPNE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int] -> $[Int])( // Returns 0 if arguments are equal and 1 if they are not.
-				ILOAD_1,
-				ILOAD_2,
-				IF_ICMPNE("7"),
-				ICONST_0,
-				IRETURN,
-				"7" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IF_ICMPNE") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -2079,17 +1152,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IF_ICMPLT")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int] -> $[Int])( // Returns 1 if the first argument is lesser than the second argument and 0 if it is not.
-				ILOAD_1,
-				ILOAD_2,
-				IF_ICMPLT("7"),
-				ICONST_0,
-				IRETURN,
-				"7" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IF_ICMPLT") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -2104,17 +1167,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IF_ICMPGE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int] -> $[Int])( // Returns 1 if the first argument is great or equal to the second argument and 0 if it is not.
-				ILOAD_1,
-				ILOAD_2,
-				IF_ICMPGE("7"),
-				ICONST_0,
-				IRETURN,
-				"7" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IF_ICMPGE") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -2129,17 +1182,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IF_ICMPGT")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int] -> $[Int])( // Returns 1 if the first argument is greater than the second argument and 0 if it is not.
-				ILOAD_1,
-				ILOAD_2,
-				IF_ICMPGT("7"),
-				ICONST_0,
-				IRETURN,
-				"7" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IF_ICMPGT") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -2154,17 +1197,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IF_ICMPLE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int] -> $[Int])( // Returns 1 if the first argument is less or equal to the second argument and 0 if it is not.
-				ILOAD_1,
-				ILOAD_2,
-				IF_ICMPLE("7"),
-				ICONST_0,
-				IRETURN,
-				"7" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IF_ICMPLE") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -2179,16 +1212,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IFEQ")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns 1 if the argument is equal to 0 and 0 if not.
-				ILOAD_1,
-				IFEQ("6"),
-				ICONST_0,
-				IRETURN,
-				"6" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IFEQ") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2202,16 +1226,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IFNE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns 0 if the argument is equal to 0 and 1 if not.
-				ILOAD_1,
-				IFNE("6"),
-				ICONST_0,
-				IRETURN,
-				"6" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IFNE") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2225,16 +1240,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IFLT")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns 1 if the argument is less than to 0 and 0 if not.
-				ILOAD_1,
-				IFLT("6"),
-				ICONST_0,
-				IRETURN,
-				"6" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IFLT") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2250,16 +1256,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IFGE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns 1 if the argument is great or equal to 0 and 0 if not.
-				ILOAD_1,
-				IFGE("6"),
-				ICONST_0,
-				IRETURN,
-				"6" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IFGE") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2275,16 +1272,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IFGT")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns 1 if the argument is greater than 0 and 0 if not.
-				ILOAD_1,
-				IFGT("6"),
-				ICONST_0,
-				IRETURN,
-				"6" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IFGT") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2301,16 +1289,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IFLE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns 1 if the argument is less or equal to 0 and 0 if not.
-				ILOAD_1,
-				IFLE("6"),
-				ICONST_0,
-				IRETURN,
-				"6" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IFLE") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2326,16 +1305,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IFNONNULL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Int])( // Returns 1 if the argument is not null and 0 if it is.
-				ALOAD_1,
-				IFNONNULL("6"),
-				ICONST_0,
-				IRETURN,
-				"6" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IFNONNULL") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2349,16 +1319,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IFNULL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Int])( // Returns 0 if the argument is not null and 1 if it is.
-				ALOAD_1,
-				IFNULL("6"),
-				ICONST_0,
-				IRETURN,
-				"6" @: ICONST_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IFNULL") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2372,15 +1333,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IINC")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 5.
-				ICONST_0,
-				ISTORE_1,
-				IINC(1, 5),
-				ILOAD_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IINC") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2389,12 +1342,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ILOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns the given int.
-				ILOAD(1),
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ILOAD") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2404,12 +1352,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ILOAD_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns the given int.
-				ILOAD_0,
-				IRETURN
-			).as(Static)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ILOAD_0") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -2419,12 +1362,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ILOAD_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns the given int.
-				ILOAD_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ILOAD_1") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2434,12 +1372,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ILOAD_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Float] -> $[Int] -> $[Int])( // Returns the given int.
-				ILOAD_2,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ILOAD_2") },
 		maxLocals = 3,
 		maxStack = 1,
 		runs = {
@@ -2450,12 +1383,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ILOAD_3")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Int] -> $[Int])( // Returns the given int.
-				ILOAD_3,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ILOAD_3") },
 		maxLocals = 4,
 		maxStack = 1,
 		runs = {
@@ -2466,14 +1394,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IMUL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 6.
-				ICONST_3,
-				ICONST_2,
-				IMUL,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IMUL") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -2482,13 +1403,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("INEG")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns -3.
-				ICONST_3,
-				INEG,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("INEG") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -2497,17 +1412,11 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("INSTANCEOF")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Object] -> $[Int])( // Returns 1 if the received object is intance of Bleh and 0 if it isn't.
-				ALOAD_1,
-				INSTANCEOF($[Bleh]),
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("INSTANCEOF") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
-			val arg1 = new Bleh
+			val arg1 = "foo"
 			val arg2 = Array()
 			Seq(
 				Run(arg1){ _ == 1 },
@@ -2517,15 +1426,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("INVOKEDYNAMIC")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Integer] -> $[Integer] -> $[Integer])( // Adds the given Integers.
-				ALOAD_1,
-				ALOAD_2,
-				//TODO: El tipo del bootstrap es siempre el mismo. No ponerlo.
-				INVOKEDYNAMIC(SlotRef_to_Bootstrap(INVOKESTATIC($[CustomBootstrap] >> "dispatch" :: $[Lookup] -> $[String] -> $[MethodType] -> $[CallSite])), "adder" :: $[Integer] -> $[Integer] -> $[Integer]),
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("INVOKEDYNAMIC") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -2536,47 +1437,27 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("INVOKEINTERFACE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Collection[_]] -> $[Object] -> $[Unit])( // Adds the given object to the given collection.
-				ALOAD_1,
-				ALOAD_2,
-				INVOKEINTERFACE($[Collection[_]] >>> "add" :: $[Object] -> $[Boolean]),
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("INVOKEINTERFACE") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
 			val arg1 = new HashSet
-			val arg2 = new Bleh
+			val arg2 = "foo"
 			Seq(Run(arg1, arg2){ _ ⇒ arg1 contains arg2 })
 		}
 	)
 
 	testInstruction("INVOKESPECIAL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Bleh])( // Returns a new Bleh instance
-				NEW($[Bleh]),
-				DUP,
-				INVOKESPECIAL($[Bleh] >> Init()),
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("INVOKESPECIAL") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
-			Seq(Run(){ _.isInstanceOf[Bleh] })
+			Seq(Run(){ _.isInstanceOf[Date] })
 		}
 	)
 
 	testInstruction("INVOKESTATIC")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[String])( // Returns "0"
-				ICONST_0,
-				INVOKESTATIC($[Integer] >> "toString" :: $[Int] -> $[String]),
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("INVOKESTATIC") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -2585,30 +1466,17 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("INVOKEVIRTUAL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Bleh] -> $[String])( // Returns the result of sending the bleh message to the received object.
-				ALOAD_1,
-				INVOKEVIRTUAL($[Bleh] >> "bleh" :: () -> $[String]),
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("INVOKEVIRTUAL") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
-			val arg = new Bleh
-			Seq(Run(arg){ _ == arg.bleh })
+			val arg = "foo"
+			Seq(Run(arg){ _ == arg.length })
 		}
 	)
 
 	testInstruction("IOR")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 5.
-				ICONST_1,
-				ICONST_4,
-				IOR,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IOR") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -2617,14 +1485,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IREM")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 1.
-				ICONST_5,
-				ICONST_2,
-				IREM,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IREM") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -2633,12 +1494,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IRETURN")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns the given int.
-				ILOAD_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IRETURN") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2648,14 +1504,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ISHL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns -8.
-				ICONST_M1,
-				ICONST_3,
-				ISHL,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ISHL") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -2664,14 +1513,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ISHR")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns -1.
-				BIPUSH(-8),
-				ICONST_3,
-				ISHR,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ISHR") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -2680,14 +1522,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ISTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns the given int after storing it in the local 2.
-				ILOAD_1,
-				ISTORE(3),
-				ILOAD(3),
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ISTORE") },
 		maxLocals = 4,
 		maxStack = 1,
 		runs = {
@@ -2697,14 +1532,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ISTORE_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns the given int after storing it in the local 0.
-				ILOAD_1,
-				ISTORE_0,
-				ILOAD_0,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ISTORE_0") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2714,14 +1542,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ISTORE_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns the given int after storing it in the local 1.
-				ILOAD_1,
-				ISTORE_1,
-				ILOAD_1,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ISTORE_1") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
@@ -2731,14 +1552,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ISTORE_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns the given int after storing it in the local 2.
-				ILOAD_1,
-				ISTORE_2,
-				ILOAD_2,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ISTORE_2") },
 		maxLocals = 3,
 		maxStack = 1,
 		runs = {
@@ -2748,16 +1562,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ISTORE_3")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns the given int after storing it in the local 3.
-				ILOAD_1,
-				ISTORE_2,
-				ILOAD_1,
-				ISTORE_3,
-				ILOAD_3,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ISTORE_3") },
 		maxLocals = 4,
 		maxStack = 1,
 		runs = {
@@ -2767,14 +1572,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("ISUB")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 1.
-				ICONST_3,
-				ICONST_2,
-				ISUB,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("ISUB") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -2783,14 +1581,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IUSHR")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 536870911.
-				BIPUSH(-8),
-				ICONST_3,
-				IUSHR,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IUSHR") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -2799,14 +1590,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("IXOR")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 1.
-				ICONST_4,
-				ICONST_5,
-				IXOR,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("IXOR") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -2816,17 +1600,9 @@ trait ExhaustiveInstructionTest extends FunSuite {
 
 	testInstruction("JSR")(
 		context = CONTEXT_TYPE let { it =>
+			it += BytecodeExample of ("JSR")
 			it.version = Java_6
 
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 2
-				ICONST_1,
-				JSR("5"),
-				IRETURN,
-				"5" @: ASTORE_1,
-				ICONST_1,
-				IADD,
-				RET(1)
-			)
 		},
 		maxLocals = 2,
 		maxStack = 2,
@@ -2837,17 +1613,9 @@ trait ExhaustiveInstructionTest extends FunSuite {
 
 	testInstruction("JSR_W")(
 		context = CONTEXT_TYPE let { it =>
+			it += BytecodeExample of ("JSR_W")
 			it.version = Java_6
 
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 2
-				ICONST_1,
-				JSR_W("7"),
-				IRETURN,
-				"7" @: ASTORE_1,
-				ICONST_1,
-				IADD,
-				RET(1)
-			)
 		},
 		maxLocals = 2,
 		maxStack = 2,
@@ -2857,13 +1625,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("L2D")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Double])( // Returns the given argument converted to another type.
-				LLOAD_1,
-				L2D,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("L2D") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -2873,13 +1635,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("L2F")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Float])( // Returns the given argument converted to another type.
-				LLOAD_1,
-				L2F,
-				FRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("L2F") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -2889,13 +1645,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("L2I")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Int])( // Returns the given argument converted to another type.
-				LLOAD_1,
-				L2I,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("L2I") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -2905,14 +1655,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LADD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 5L.
-				LDC2_W(3L),
-				LDC2_W(2L),
-				LADD,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LADD") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -2921,14 +1664,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LALOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Array[Long]] -> $[Long])( // Returns the first long of the given array.
-				ALOAD_1,
-				ICONST_0,
-				LALOAD,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LALOAD") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -2938,14 +1674,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LAND")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 4.
-				LDC2_W(5L),
-				LDC2_W(4L),
-				LAND,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LAND") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -2954,15 +1683,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LASTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Array[Long]] -> $[Unit])( // Stores the given long as the first element of the given array.
-				ALOAD_3,
-				ICONST_0,
-				LLOAD_1,
-				LASTORE,
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LASTORE") },
 		maxLocals = 4,
 		maxStack = 4,
 		runs = {
@@ -2973,14 +1694,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LCMP")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Long] -> $[Int])( // Compares the received longs.
-				LLOAD_1,
-				LLOAD_3,
-				LCMP,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LCMP") },
 		maxLocals = 5,
 		maxStack = 4,
 		runs = {
@@ -2995,12 +1709,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LCONST_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 0L.
-				LCONST_0,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LCONST_0") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -3009,12 +1718,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LCONST_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 1L.
-				LCONST_1,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LCONST_1") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -3023,35 +1727,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LDC")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Char])( // Returns 'o'.
-				LDC("Hello"),
-				LDC(1),
-				LDC(3.0F),
-				F2I,
-				IADD,
-				INVOKEVIRTUAL($[String] >> "charAt" :: $[Int] -> $[Char]),
-				IRETURN
-			)
-		},
-		maxLocals = 1,
-		maxStack = 3,
-		runs = {
-			Seq(Run(){ _ == 'o' })
-		}
-	)
-	testInstruction("LDC_W")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Char])( // Returns 'o'.
-				LDC_W("Hello"),
-				LDC_W(1),
-				LDC_W(3.0F),
-				F2I,
-				IADD,
-				INVOKEVIRTUAL($[String] >> "charAt" :: $[Int] -> $[Char]),
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LDC") },
 		maxLocals = 1,
 		maxStack = 3,
 		runs = {
@@ -3060,15 +1736,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LDC2_W")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Double])( // Returns 7.5.
-				LDC2_W(5L),
-				L2D,
-				LDC2_W(2.5),
-				DADD,
-				DRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LDC2_W") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -3077,14 +1745,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LDIV")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 2L.
-				LDC2_W(5L),
-				LDC2_W(2L),
-				LDIV,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LDIV") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -3093,12 +1754,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LLOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Long])( // Returns the given long.
-				LLOAD(1),
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LLOAD") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -3108,12 +1764,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LLOAD_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Long])( // Returns the given long.
-				LLOAD_0,
-				LRETURN
-			).as(Static)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LLOAD_0") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -3123,12 +1774,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LLOAD_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Long])( // Returns the given long.
-				LLOAD_1,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LLOAD_1") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -3138,12 +1784,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LLOAD_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Long] -> $[Long])( // Returns the given long.
-				LLOAD_2,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LLOAD_2") },
 		maxLocals = 4,
 		maxStack = 2,
 		runs = {
@@ -3154,12 +1795,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LLOAD_3")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Double] -> $[Long] -> $[Long])( // Returns the given long.
-				LLOAD_3,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LLOAD_3") },
 		maxLocals = 5,
 		maxStack = 2,
 		runs = {
@@ -3170,14 +1806,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LMUL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 6L.
-				LDC2_W(3L),
-				LDC2_W(2L),
-				LMUL,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LMUL") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -3186,13 +1815,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LNEG")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns -3L.
-				LDC2_W(3L),
-				LNEG,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LNEG") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -3201,23 +1824,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LOOKUPSWITCH")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // If arg is between 2 and 4 returns itself if odd and it's half if even, otherwise returns 0.
-				ILOAD_1,
-				LOOKUPSWITCH("42", (2, "36"), (3, "40"), (4, "36")),
-
-				"36" @: ILOAD_1,
-				ICONST_2,
-				IDIV,
-				IRETURN,
-
-				"40" @: ILOAD_1,
-				IRETURN,
-
-				"42" @: ICONST_0,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LOOKUPSWITCH") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = Seq(
@@ -3230,14 +1837,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LOR")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 5.
-				LCONST_1,
-				LDC2_W(4L),
-				LOR,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LOR") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = Seq(
@@ -3246,14 +1846,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LREM")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 2L.
-				LDC2_W(5L),
-				LDC2_W(2L),
-				LREM,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LREM") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = Seq(
@@ -3262,12 +1855,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LRETURN")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Long])( // Returns the given long.
-				LLOAD_1,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LRETURN") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -3277,14 +1865,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LSHL")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns -8L.
-				LDC2_W(-1L),
-				ICONST_3,
-				LSHL,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LSHL") },
 		maxLocals = 1,
 		maxStack = 3,
 		runs = {
@@ -3293,14 +1874,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LSHR")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns -1L.
-				LDC2_W(-8L),
-				ICONST_3,
-				LSHR,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LSHR") },
 		maxLocals = 1,
 		maxStack = 3,
 		runs = {
@@ -3309,14 +1883,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LSTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Long])( // Returns the given long after storing it in the local 3.
-				LLOAD_1,
-				LSTORE(3),
-				LLOAD(3),
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LSTORE") },
 		maxLocals = 5,
 		maxStack = 2,
 		runs = {
@@ -3326,14 +1893,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LSTORE_0")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 1L after storing it in the local 0.
-				LCONST_1,
-				LSTORE_0,
-				LLOAD_0,
-				LRETURN
-			).as(Static)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LSTORE_0") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -3342,14 +1902,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LSTORE_1")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Long])( // Returns the given long after storing it in the local 1.
-				LLOAD_1,
-				LSTORE_1,
-				LLOAD_1,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LSTORE_1") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
@@ -3359,14 +1912,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LSTORE_2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Long])( // Returns 1L after storing it in the local 2.
-				LCONST_1,
-				LSTORE_2,
-				LLOAD_2,
-				LRETURN
-			).as(Static)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LSTORE_2") },
 		maxLocals = 4,
 		maxStack = 2,
 		runs = {
@@ -3376,14 +1922,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LSTORE_3")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Long] -> $[Long])( // Returns the given long after storing it in the local 3.
-				LLOAD_1,
-				LSTORE_3,
-				LLOAD_3,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LSTORE_3") },
 		maxLocals = 5,
 		maxStack = 2,
 		runs = {
@@ -3393,14 +1932,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LSUB")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 1L.
-				LDC2_W(3L),
-				LDC2_W(2L),
-				LSUB,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LSUB") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -3409,14 +1941,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LUSHR")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 2305843009213693951L.
-				LDC2_W(-8L),
-				ICONST_3,
-				LUSHR,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LUSHR") },
 		maxLocals = 1,
 		maxStack = 3,
 		runs = {
@@ -3425,14 +1950,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("LXOR")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 1L.
-				LDC2_W(4L),
-				LDC2_W(5L),
-				LXOR,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("LXOR") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -3441,19 +1959,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("MONITORENTER")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Array[Object]] -> $[Unit])( // Removes the first element received array thread safely.
-				ALOAD_1,
-				MONITORENTER,
-				ALOAD_1,
-				DUP,
-				ICONST_0,
-				ACONST_NULL,
-				AASTORE,
-				MONITOREXIT,
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("MONITORENTER") },
 		maxLocals = 2,
 		maxStack = 4,
 		runs = {
@@ -3463,19 +1969,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("MONITOREXIT")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Array[Object]] -> $[Unit])( // Removes the first element received array thread safely.
-				ALOAD_1,
-				MONITORENTER,
-				ALOAD_1,
-				DUP,
-				ICONST_0,
-				ACONST_NULL,
-				AASTORE,
-				MONITOREXIT,
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("MONITOREXIT") },
 		maxLocals = 2,
 		maxStack = 4,
 		runs = {
@@ -3485,13 +1979,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("MULTIANEWARRAY")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Array[Array[Object]]])( // Returns a new Object[3][]
-				ICONST_3,
-				MULTIANEWARRAY($[Object], 2, 1),
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("MULTIANEWARRAY") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -3500,29 +1988,16 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("NEW")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Foo])( // Returns a new Foo instance
-				NEW($[Foo]),
-				DUP,
-				INVOKESPECIAL($[Foo] >> Init()),
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("NEW") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
-			Seq(Run(){ _.isInstanceOf[Foo] })
+			Seq(Run(){ _.isInstanceOf[Date] })
 		}
 	)
 
 	testInstruction("NEWARRAY")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Array[Int]])( // Returns a new int[2]
-				ICONST_2,
-				NEWARRAY($[Int]),
-				ARETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("NEWARRAY") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -3531,12 +2006,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("NOP")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Unit])( // Does nothing.
-				NOP,
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("NOP") },
 		maxLocals = 1,
 		maxStack = 0,
 		runs = {
@@ -3545,14 +2015,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("POP")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 5.
-				ICONST_5,
-				ICONST_2,
-				POP,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("POP") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -3561,14 +2024,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("POP2")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Long])( // Returns 5L.
-				LDC2_W(5L),
-				LDC2_W(2L),
-				POP2,
-				LRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("POP2") },
 		maxLocals = 1,
 		maxStack = 4,
 		runs = {
@@ -3577,53 +2033,36 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("PUTFIELD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Bleh] -> $[Int] -> $[Unit])( // Sets the target object field to the given value
-				ALOAD_1,
-				ILOAD_2,
-				PUTFIELD($[Bleh] >> "att" :: $[Int]),
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("PUTFIELD") },
 		maxLocals = 3,
 		maxStack = 2,
 		runs = {
-			val arg1 = new Bleh
+			val arg1 = new Point(1, 3)
 			val arg2 = 15
-			Seq(Run(arg1, arg2){ _ ⇒ arg1.att == arg2 })
+			Seq(Run(arg1, arg2){ _ ⇒ arg1.x == arg2 })
 		}
 	)
 
 	testInstruction("PUTSTATIC")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Unit])( // Sets the ATT static field to the given value
-				ILOAD_1,
-				PUTSTATIC($[Bleh] >> "ATT" :: $[Int]),
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("PUTSTATIC") },
 		maxLocals = 2,
 		maxStack = 1,
 		runs = {
-			Bleh.ATT = 10
 			val arg = 15
-			Seq(Run(arg){ _ ⇒ Bleh.ATT == arg })
+			Seq(Run(arg){ _ =>
+				val clazz = classLoader.loadClass("Bleh")
+				val field = clazz.getField("ATT")
+
+				field.get(null) == arg
+			})
 		}
 	)
 
 	testInstruction("RET")(
 		context = CONTEXT_TYPE let { it =>
+			it += BytecodeExample of ("RET")
 			it.version = Java_6
 
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns 2.
-				ICONST_1,
-				JSR("5"),
-				IRETURN,
-				"5" @: ASTORE_1,
-				ICONST_1,
-				IADD,
-				RET(1)
-			)
 		},
 		maxLocals = 2,
 		maxStack = 2,
@@ -3633,11 +2072,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("RETURN")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Unit])( // Does nothing.
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("RETURN") },
 		maxLocals = 1,
 		maxStack = 0,
 		runs = {
@@ -3646,14 +2081,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("SALOAD")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Array[Short]] -> $[Short])( // Returns the first short of the given array.
-				ALOAD_1,
-				ICONST_0,
-				SALOAD,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("SALOAD") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = {
@@ -3663,15 +2091,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("SASTORE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Short] -> $[Array[Short]] -> $[Unit])( // Stores the given short as the first element of the given array.
-				ALOAD_2,
-				ICONST_0,
-				ILOAD_1,
-				SASTORE,
-				RETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("SASTORE") },
 		maxLocals = 3,
 		maxStack = 3,
 		runs = {
@@ -3682,12 +2102,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("SIPUSH")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Byte])( // Returns 5.
-				SIPUSH(5),
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("SIPUSH") },
 		maxLocals = 1,
 		maxStack = 1,
 		runs = {
@@ -3696,15 +2111,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("SWAP")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: () -> $[Int])( // Returns -1.
-				ICONST_3,
-				ICONST_2,
-				SWAP,
-				ISUB,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("SWAP") },
 		maxLocals = 1,
 		maxStack = 2,
 		runs = {
@@ -3713,23 +2120,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("TABLESWITCH")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // If arg is between 2 and 4 returns itself if odd and it's half if even, otherwise returns 0.
-				ILOAD_1,
-				TABLESWITCH(2, "34", "28", "32", "28"),
-
-				"28" @: ILOAD_1,
-				ICONST_2,
-				IDIV,
-				IRETURN,
-
-				"32" @: ILOAD_1,
-				IRETURN,
-
-				"34" @: ICONST_0,
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("TABLESWITCH") },
 		maxLocals = 2,
 		maxStack = 2,
 		runs = Seq(
@@ -3742,15 +2133,7 @@ trait ExhaustiveInstructionTest extends FunSuite {
 	)
 
 	testInstruction("WIDE")(
-		context = CONTEXT_TYPE let { it =>
-			it += (METHOD_SELECTOR :: $[Int] -> $[Int])( // Returns the given int increased by 1000 after storing it in the local 300.
-				ILOAD_1,
-				WIDE(ISTORE(300)),
-				WIDE(IINC(300, 1000)),
-				WIDE(ILOAD(300)),
-				IRETURN
-			)
-		},
+		context = CONTEXT_TYPE let { _ += BytecodeExample of ("WIDE") },
 		maxLocals = 301,
 		maxStack = 1,
 		runs = {

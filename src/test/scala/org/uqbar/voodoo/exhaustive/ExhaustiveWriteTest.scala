@@ -7,15 +7,23 @@ import org.uqbar.voodoo.model.Class
 
 class ExhaustiveWriteTest extends ExhaustiveInstructionTest {
 	protected def apply(instructionName: String, context: Class, maxLocals: Int, maxStack: Int, runs: Seq[Run]) {
-		try
+		try {
+
 			for (run ← runs) {
-				val instance = new BytecodeClassLoader().importClass(context).newInstance
+				classLoader = new BytecodeClassLoader
+				val blehClassName = getClass.getResource("/Bleh.class").getFile
+				val clazz = classLoader.importClass(blehClassName)
+				val field = clazz.getField("ATT")
+				field.set(null, 10)
+				val cbClassName = getClass.getResource("/CustomBootstrap.class").getFile
+				classLoader.importClass(cbClassName)
+
+				val instance = classLoader.importClass(context).newInstance
 				val method = instance.getClass.getMethods.find{ _.getName == METHOD_SELECTOR }.get
 				val answer = try method.invoke(instance, run.args.map(_.asInstanceOf[AnyRef]): _*)
 				catch { case e: InvocationTargetException ⇒ e.getTargetException }
-
 				assert(run.expected(answer))
 			}
-		catch { case e: Throwable ⇒ throw new RuntimeException(e) }
+		} catch { case e: Throwable ⇒ throw new RuntimeException(e) }
 	}
 }
