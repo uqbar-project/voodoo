@@ -14,13 +14,14 @@ import org.uqbar.voodoo.mutator.MutableType
 import java.lang.invoke.ConstantCallSite
 import java.util.Date
 import java.awt.Point
+import org.uqbar.voodoo.model.ClassVersion.Java_6
 
 object BytecodeExample {
 
 	protected val CONTEXT_TYPE = $("TestClass")
-	protected val METHOD_SELECTOR = "test"
+	val METHOD_SELECTOR = "test"
 
-	val of = Map(
+	val methods = Map(
 		"AALOAD" -> (METHOD_SELECTOR :: $[Array[Object]] -> $[Object])( // Returns the first object of the given array.
 			ALOAD_1,
 			ICONST_0,
@@ -1432,7 +1433,12 @@ object BytecodeExample {
 			WIDE(ILOAD(300)),
 			IRETURN
 		)
-
 	)
 
+	def classFor(instruction: String) = CONTEXT_TYPE.let{ it =>
+		if (List("RET", "JSR", "JSR_W") contains instruction) it.version = Java_6
+		it += methods(instruction)
+	}
+
+	def of(instruction: String) = classFor(instruction).methods.find(_.signature.selector == METHOD_SELECTOR).get
 }

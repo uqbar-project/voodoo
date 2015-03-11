@@ -1,21 +1,36 @@
 package org.uqbar.voodoo.exhaustive
 
 import java.io.File
-
-import org.uqbar.voodoo.model.Class
+import scala.annotation.migration
+import org.scalatest.FreeSpec
+import org.scalatest.Matchers
+import org.scalatest.prop.TableDrivenPropertyChecks
 import org.uqbar.voodoo.parser.ClassParser
 import org.uqbar.voodoo.writer.ClassWriter
+import org.scalatest.BeforeAndAfterAll
 
-class ExhaustiveParseTest extends ExhaustiveInstructionTest {
-	protected def apply(instructionName: String, context: Class, maxLocals: Int, maxStack: Int, runs: Seq[Run]) {
-		val path = getClass.getProtectionDomain.getCodeSource.getLocation.getFile + "GENERATED/"
-		val filePath = s"$path$instructionName.class"
-		new File(path).mkdir
+class ExhaustiveParseTest extends FreeSpec with TableDrivenPropertyChecks with Matchers with BeforeAndAfterAll {
 
-		ClassWriter.writeClass(context, filePath)
+	val TEMP_PATH = new File(s"${getClass.getProtectionDomain.getCodeSource.getLocation.getFile}GENERATED")
+	
+	override def beforeAll {
+		TEMP_PATH.mkdir
+	}
 
-		val parsed = ClassParser.parseClass(filePath)
+	override def afterAll {
+		TEMP_PATH.listFiles.foreach{ _.delete } 
+		TEMP_PATH.delete
+	}
 
-		assertResult(context)(parsed)
+	"Parse should be as expected" in {
+		for {
+			instruction <- BytecodeExample.methods.keys
+			example = BytecodeExample classFor instruction
+			filePath = s"$TEMP_PATH${File.separator}$instruction.class"
+		} {
+			ClassWriter.writeClass(example, filePath)
+
+			ClassParser.parseClass(filePath) should be (example)
+		}
 	}
 }

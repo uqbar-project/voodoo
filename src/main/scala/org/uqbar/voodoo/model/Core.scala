@@ -50,7 +50,7 @@ case class Field(
 		modifiers : Set[FieldModifier],
 		attributes : Set[Attribute[Field]]) extends Slot {
 
-	def constantValue[T >: DataType] = attributes.collectFirst{ case a : ConstantValue[T] ⇒ a }
+	def constantValue[T >: DataType] = attributes.collectFirst{ case a : ConstantValue[_] ⇒ a.asInstanceOf[ConstantValue[T]] }
 	def constantValue_=(a : ConstantValue[_]) = copy(attributes = attributes + a)
 
 	def as(ms : Modifier[_ <: Field]*) = copy( //TODO: What if wee just remove the as method?
@@ -69,7 +69,7 @@ case class Method(
 
 	def code = attribute[Code].get
 
-	def as(ms : Modifier[_ <: Method]*) = { //TODO: What if wee just remove the as method?
+	def as(ms : Modifier[_ <: Method]*) = { //TODO: What if we just remove the as method?
 		val answer = copy(
 			visibility = ms.collectFirst{ case m : Visibility ⇒ m }.getOrElse(visibility),
 			modifiers = modifiers ++ ms.collect{ case m : MethodModifier ⇒ m },
