@@ -35,6 +35,4 @@ class BytecodeClassLoader extends ClassLoader with ClassWriter {
 
 		defineClass(name, bytes, 0, bytes.length)
 	}
-
-	//	override def loadClass(name: String) = loadClass(name, true)
 }

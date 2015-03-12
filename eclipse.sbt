@@ -1,3 +1,5 @@
-EclipseKeys.withSource := true
+EclipseKeys.createSrc in Compile := EclipseCreateSrc.Default
 
-EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
+EclipseKeys.createSrc in Test := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
+
+EclipseKeys.withSource := true

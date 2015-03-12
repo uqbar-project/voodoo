@@ -16,6 +16,6 @@ lazy val cacao = FDProject(
 
 scalacOptions += "-feature"
 
-compileOrder in Compile := CompileOrder.JavaThenScala
+unmanagedSourceDirectories in Compile := Seq((scalaSource in Compile).value)
 
-compileOrder in Test := CompileOrder.Mixed
+unmanagedSourceDirectories in Test := Seq((scalaSource in Test).value)
