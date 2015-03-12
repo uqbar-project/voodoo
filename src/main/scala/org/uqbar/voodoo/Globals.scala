@@ -1,6 +1,7 @@
 package org.uqbar.voodoo
 
 import org.uqbar.voodoo.model.constants._
+import scala.reflect.runtime._
 import org.uqbar.voodoo.model._
 import scala.reflect.ClassTag
 
@@ -8,33 +9,33 @@ object Globals {
 	final val MAGIC = 0xCAFEBABE
 
 	type ConstantTag = Int
-	final val TypeTag : ConstantTag = 7
-	final val FieldTag : ConstantTag = 9
-	final val MethodTag : ConstantTag = 10
-	final val InterfaceMethodTag : ConstantTag = 11
-	final val StringTag : ConstantTag = 8
-	final val IntTag : ConstantTag = 3
-	final val FloatTag : ConstantTag = 4
-	final val LongTag : ConstantTag = 5
-	final val DoubleTag : ConstantTag = 6
-	final val SignatureTag : ConstantTag = 12
-	final val UTF8Tag : ConstantTag = 1
-	final val MethodHandleTag : ConstantTag = 15
-	final val MethodTypeTag : ConstantTag = 16
-	final val InvokeDynamicTag : ConstantTag = 18
+	final val TypeTag: ConstantTag = 7
+	final val FieldTag: ConstantTag = 9
+	final val MethodTag: ConstantTag = 10
+	final val InterfaceMethodTag: ConstantTag = 11
+	final val StringTag: ConstantTag = 8
+	final val IntTag: ConstantTag = 3
+	final val FloatTag: ConstantTag = 4
+	final val LongTag: ConstantTag = 5
+	final val DoubleTag: ConstantTag = 6
+	final val SignatureTag: ConstantTag = 12
+	final val UTF8Tag: ConstantTag = 1
+	final val MethodHandleTag: ConstantTag = 15
+	final val MethodTypeTag: ConstantTag = 16
+	final val InvokeDynamicTag: ConstantTag = 18
 
 	type ReferenceKind = Int
-	final val GetField : ReferenceKind = 1
-	final val GetStatic : ReferenceKind = 2
-	final val PutField : ReferenceKind = 3
-	final val PutStatic : ReferenceKind = 4
-	final val InvokeVirtual : ReferenceKind = 5
-	final val InvokeStatic : ReferenceKind = 6
-	final val InvokeSpecial : ReferenceKind = 7
-	final val NewInvokeSpecial : ReferenceKind = 8
-	final val InvokeInterface : ReferenceKind = 9
+	final val GetField: ReferenceKind = 1
+	final val GetStatic: ReferenceKind = 2
+	final val PutField: ReferenceKind = 3
+	final val PutStatic: ReferenceKind = 4
+	final val InvokeVirtual: ReferenceKind = 5
+	final val InvokeStatic: ReferenceKind = 6
+	final val InvokeSpecial: ReferenceKind = 7
+	final val NewInvokeSpecial: ReferenceKind = 8
+	final val InvokeInterface: ReferenceKind = 9
 
-	def referenceOfKind(kind : ReferenceKind, slotRef : SlotRef[_]) : MethodHandle = kind match {
+	def referenceOfKind(kind: ReferenceKind, slotRef: SlotRef[_]): MethodHandle = kind match {
 		case GetField ⇒ GETFIELD(slotRef.asInstanceOf[SlotRef[Field]])
 		case GetStatic ⇒ GETSTATIC(slotRef.asInstanceOf[SlotRef[Field]])
 		case PutField ⇒ PUTFIELD(slotRef.asInstanceOf[SlotRef[Field]])
@@ -46,7 +47,7 @@ object Globals {
 		case InvokeInterface ⇒ INVOKEINTERFACE(slotRef.asInstanceOf[SlotRef[Method]])
 	}
 
-	def kindOfReference(m : MethodHandle) = m match {
+	def kindOfReference(m: MethodHandle) = m match {
 		case GETFIELD(_) ⇒ GetField
 		case GETSTATIC(_) ⇒ GetStatic
 		case PUTFIELD(_) ⇒ PutField
@@ -58,13 +59,9 @@ object Globals {
 		case INVOKEINTERFACE(slotRef) ⇒ InvokeInterface
 	}
 
-	def companion(instance : Any) = {
-		import scala.reflect.runtime._
+	def companion(instance: Any) = {
 		val rootMirror = universe.runtimeMirror(instance.getClass.getClassLoader)
-		val classSymbol = rootMirror.classSymbol(instance.getClass)
-		val classMirror = rootMirror.reflectClass(classSymbol)
-		val moduleMirror = rootMirror.reflectModule(classMirror.symbol.companionSymbol.asModule)
-		moduleMirror.instance
+		rootMirror.reflectModule(rootMirror.moduleSymbol(instance.getClass)).instance
 	}
 
 	val flagFromInstruction = Map[Any, Int]( //TODO: Unify with flagFor?
@@ -276,7 +273,7 @@ object Globals {
 	)
 	val instructionFromFlag = flagFromInstruction.map(_.swap)
 
-	def verificationTypeCode(verificationType : VerificationTypeInfo) = verificationType match {
+	def verificationTypeCode(verificationType: VerificationTypeInfo) = verificationType match {
 		case TopType ⇒ 0
 		case IntegerType ⇒ 1
 		case FloatType ⇒ 2
@@ -333,10 +330,10 @@ object Globals {
 		MethodModifier.Static -> 0x0008
 	)
 
-	def flagFor(xs : Modifier[_]*) = xs.foldLeft(0)(_ | flags(_))
+	def flagFor(xs: Modifier[_]*) = xs.foldLeft(0)(_ | flags(_))
 
-	def fromFlag[T : ClassTag](code : Int) = flags.filter {
-		case (k : T, c) ⇒ (c & code) == c
+	def fromFlag[T: ClassTag](code: Int) = flags.filter {
+		case (k: T, c) ⇒ (c & code) == c
 		case _ ⇒ false
 	}.map(_._1.asInstanceOf[T]).toSet
 
@@ -344,7 +341,7 @@ object Globals {
 	// ** SIZE
 	// ****************************************************************
 
-	def byteSize(attribute : Attribute[_ <: Attributable]) : Int = attribute match {
+	def byteSize(attribute: Attribute[_ <: Attributable]): Int = attribute match {
 		case ConstantValue(value) ⇒ 2
 
 		case code @ Code(instructions, exceptionHandlers, _) ⇒
@@ -359,7 +356,7 @@ object Globals {
 
 		case RuntimeInvisibleParameterAnnotations(parameterAnnotations @ _*) ⇒ 1 + parameterAnnotations.map(2 + _.map(byteSize(_)).sum).sum
 
-		case AnnotationDefault(value : Any) ⇒ annotationValueByteSize(value)
+		case AnnotationDefault(value: Any) ⇒ annotationValueByteSize(value)
 
 		case StackMapTable(entries @ _*) ⇒ 2 + entries.map(byteSize(_)).sum
 
@@ -387,10 +384,10 @@ object Globals {
 
 		case RuntimeInvisibleAnnotations(annotations @ _*) ⇒ 2 + annotations.map(byteSize(_)).sum
 
-		case a : CustomAttribute[_] ⇒ a.byteSize
+		case a: CustomAttribute[_] ⇒ a.byteSize
 	}
 
-	def byteSize(frame : StackMapFrame) : Int = 1 + (frame match {
+	def byteSize(frame: StackMapFrame): Int = 1 + (frame match {
 		case AppendFrame(_, locals @ _*) ⇒ 2 + locals.map(byteSize(_)).sum
 		case ChopFrame(_, _) ⇒ 2
 		case SameFrame(_) ⇒ 0
@@ -400,28 +397,28 @@ object Globals {
 		case FullFrame(_, stack, locals) ⇒ 2 + 2 + stack.map(byteSize(_)).sum + 2 + locals.map(byteSize(_)).sum
 	})
 
-	def byteSize(verificationType : VerificationTypeInfo) = verificationType match {
+	def byteSize(verificationType: VerificationTypeInfo) = verificationType match {
 		case ObjectVariableInfo(_) | UninitializedVariableInfo(_) ⇒ 3
 		case _ ⇒ 1
 	}
 
-	def byteSize(instructions : Seq[Instruction]) : Int = instructions.foldLeft(0){ (acum, instruction) ⇒ byteSize(instruction, acum) + acum }
+	def byteSize(instructions: Seq[Instruction]): Int = instructions.foldLeft(0){ (acum, instruction) ⇒ byteSize(instruction, acum) + acum }
 
-	def byteSize(instruction : Instruction, codeOffset : Int) : Int = 1 + (instruction match {
-		case _ : LocalAccessor ⇒ 1
+	def byteSize(instruction: Instruction, codeOffset: Int): Int = 1 + (instruction match {
+		case _: LocalAccessor ⇒ 1
 		case IINC(_, _) ⇒ 2
 
 		case NEWARRAY(_) ⇒ 1
 		case NEW(_) | ANEWARRAY(_) | CHECKCAST(_) | INSTANCEOF(_) ⇒ 2
 		case MULTIANEWARRAY(_, _, _) ⇒ 3
 
-		case _ : FieldAccessor ⇒ 2
+		case _: FieldAccessor ⇒ 2
 
 		case LDC(_) | BIPUSH(_) ⇒ 1
 		case LDC_W(_) | LDC2_W(_) | SIPUSH(_) ⇒ 2
 
 		case GOTO_W(_) | JSR_W(_) ⇒ 4
-		case _ : Jump ⇒ 2
+		case _: Jump ⇒ 2
 
 		case INVOKESPECIAL(_) | INVOKESTATIC(_) | INVOKEVIRTUAL(_) ⇒ 2
 		case INVOKEINTERFACE(_) | INVOKEDYNAMIC(_, _) ⇒ 4
@@ -438,13 +435,13 @@ object Globals {
 		case _ ⇒ 0
 	})
 
-	def byteSize(annotation : Annotation) : Int = 2 + 2 + annotation.values.map(annotationValueByteSize(_)).sum
+	def byteSize(annotation: Annotation): Int = 2 + 2 + annotation.values.map(annotationValueByteSize(_)).sum
 
-	def annotationValueByteSize(v : Any) : Int = 1 + (v match {
-		case _ : Data[_] ⇒ 2
-		case (_ : String, _ : String) ⇒ 4
-		case _ : Type ⇒ 2
-		case a : Annotation ⇒ byteSize(a)
-		case s : Seq[_] ⇒ 2 + s.map(annotationValueByteSize(_)).sum
+	def annotationValueByteSize(v: Any): Int = 1 + (v match {
+		case _: Data[_] ⇒ 2
+		case (_: String, _: String) ⇒ 4
+		case _: Type ⇒ 2
+		case a: Annotation ⇒ byteSize(a)
+		case s: Seq[_] ⇒ 2 + s.map(annotationValueByteSize(_)).sum
 	})
 }
