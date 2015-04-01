@@ -14,7 +14,7 @@ initialize := {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-lazy val cacao = FDProject(
+lazy val project = FDProject(
 	"org.scala-lang" % "scala-reflect" % "2.11.6",
 	"org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.3",
 	"org.scalatest" %% "scalatest" % "2.2.4" % "test"
