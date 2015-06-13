@@ -35,6 +35,9 @@ case class ConstantValue[T >: DataType](value : T) extends Attribute[Field] //TO
 // ****************************************************************
 
 case class Code(instructions : Seq[Instruction], exceptionHandlers : Seq[ExceptionHandler] = Seq(), baseAttributes : Set[Attribute[Code]] = Set()) extends Attributable with Attribute[Method] { //TODO: Fix _Attributes
+	
+	require(instructions.nonEmpty, "Code instructions can't be empty")
+	
 	var owner : Method = _
 
 	def maxStack = stackMapTable.maxStack
